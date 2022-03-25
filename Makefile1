@@ -1,0 +1,41 @@
+CC=gcc
+CFLAGS=-Wall -Werror -Wextra
+LDFLAGS=
+SOURCES1=modules_db.c modules.c shared.c levels.c status_events.c
+SOURCES2=modules.c modules_tests.c
+SOURCES3=shared.c shared_tests.c modules.c levels.c status_events.c
+OBJECTS1=$(SOURCES1:.c=.o)
+OBJECTS2=$(SOURCES2:.c=.o)
+OBJECTS3=$(SOURCES3:.c=.o)
+BUILD=$(./)
+EXECUTABLE=$(BUILD)modules_db
+
+
+
+all: build
+
+# "Build" target depends on and build the final executable file of the app
+build: modules_db
+
+rebuild: clean all
+
+clean:
+	rm -rf *.o $(BUILD)modules_db
+
+modules_db: $(OBJECTS1)
+	$(CC) $(OBJECTS1) -o $(EXECUTABLE)
+	rm -rf *.o
+
+modules_test: $(OBJECTS2)
+	$(CC) $(CFLAGS) $(OBJECTS2) -o mod_test_$(EXECUTABLE)
+	rm -rf *.o
+
+shared_test: $(OBJECTS3)
+	$(CC) $(CFLAGS) $(OBJECTS3) -o shared_$(EXECUTABLE)
+	rm -rf *.o
+#------------------------DON'T FORGET REMOVE CPPCHECK AND LINT----------------------------------
+.c.o:
+	python3 ../materials/linters/cpplint.py $< *.h
+	~/cppcheck/2.7/bin/cppcheck --enable=all --suppress=missingIncludeSystem $< *.h
+#	cppcheck --enable=all --suppress=missingIncludeSystem *.c *.h
+	$(CC) $(CFLAGS) -c $< -o $@
